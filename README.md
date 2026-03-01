@@ -2,6 +2,8 @@
 
 An open-source dashboard that monitors **Ethereum Mainnet RPC providers** in real time. It pings a curated list of public RPC endpoints, measures latency and availability, and surfaces metrics so you can compare centralized vs decentralized providers and choose resilient endpoints.
 
+**Live preview:** [https://decentralized-rpc-hub.netlify.app](https://decentralized-rpc-hub.netlify.app)
+
 ---
 
 ## What the app does
