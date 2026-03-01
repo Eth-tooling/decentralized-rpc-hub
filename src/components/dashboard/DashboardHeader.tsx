@@ -1,5 +1,7 @@
 import { Radio, Wallet } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { getEthBalance } from "@/lib/ethereum";
+import { checksumAddress } from "@/lib/ethereum";
 
 declare global {
   interface Window {
@@ -14,6 +16,18 @@ declare global {
 const DashboardHeader = () => {
   const [account, setAccount] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [balance, setBalance] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!account) { setBalance(null); return; }
+    let cancelled = false;
+    const validated = checksumAddress(account);
+    if (!validated) return;
+    getEthBalance(validated).then((bal) => {
+      if (!cancelled) setBalance(parseFloat(bal).toFixed(4));
+    }).catch(() => { if (!cancelled) setBalance(null); });
+    return () => { cancelled = true; };
+  }, [account]);
 
   const connectWallet = useCallback(async () => {
     if (!window.ethereum?.isMetaMask) {
@@ -63,7 +77,7 @@ const DashboardHeader = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded border border-primary/40 bg-primary/10 hover:bg-primary/20 transition-colors text-xs font-mono text-primary disabled:opacity-50"
           >
             <Wallet className="w-3.5 h-3.5" />
-            {connecting ? "Connecting…" : truncated ?? "Connect Wallet"}
+            {connecting ? "Connecting…" : truncated ? `${truncated}${balance ? ` · ${balance} ETH` : ""}` : "Connect Wallet"}
           </button>
         </div>
       </div>
